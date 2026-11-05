@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Report | InvenTrack</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            display: flex;
+            min-height: 100vh;
+            color: #263247;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: #17233d;
+            color: white;
+            padding: 25px 18px;
+            min-height: 100vh;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 35px;
+        }
+
+        .logo span {
+            color: #60a5fa;
+        }
+
+        .menu-title {
+            font-size: 11px;
+            color: #9ca9bd;
+            margin: 20px 10px 12px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 13px 14px;
+            color: #d5dbea;
+            text-decoration: none;
+            border-radius: 7px;
+            margin-bottom: 7px;
+            font-size: 14px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #30466c;
+            color: white;
+        }
+
+        .main {
+            flex: 1;
+            padding: 35px;
+            min-width: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-size: 27px;
+            margin-bottom: 7px;
+        }
+
+        .header p {
+            color: #7b8799;
+            font-size: 14px;
+        }
+
+        .refresh-btn {
+            background: #3157c8;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 23px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+            border: 1px solid #e9edf4;
+        }
+
+        .card p {
+            color: #778399;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            font-size: 29px;
+        }
+
+        .blue { border-left: 4px solid #3b82f6; }
+        .green { border-left: 4px solid #16a34a; }
+        .orange { border-left: 4px solid #f59e0b; }
+        .red { border-left: 4px solid #ef4444; }
+
+        .report-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #e9edf4;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .report-header h2 {
+            font-size: 19px;
+        }
+
+        .search {
+            padding: 10px 13px;
+            border: 1px solid #dce2ec;
+            border-radius: 7px;
+            outline: none;
+            width: 230px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 1px solid #edf0f5;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f7f9fc;
+            color: #68758a;
+        }
+
+        .status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .in-stock {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .low-stock {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .out-stock {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #7b8799;
+        }
+
+        @media(max-width: 950px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 650px) {
+            body {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-height: auto;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">Inven<span>Track</span></div>
+
+        <p class="menu-title">MAIN MENU</p>
+
+        <a href="index.html">▦ Dashboard</a>
+        <a href="products.html">📦 Products</a>
+        <a href="addProduct.html">＋ Add Product</a>
+        <a href="suppliers.html">🏢 Suppliers</a>
+        <a href="transactions.html">↔ Transactions</a>
+        <a href="stockReport.html" class="active">📊 Stock Report</a>
+    </aside>
+
+    <main class="main">
+
+        <div class="header">
+            <div>
+                <h1>Stock Report</h1>
+                <p>Monitor your inventory and stock levels</p>
+            </div>
+
+            <button class="refresh-btn" onclick="loadReport()">
+                ↻ Refresh Report
+            </button>
+        </div>
+
+        <section class="cards">
+
+            <div class="card blue">
+                <p>Total Products</p>
+                <h2 id="totalProducts">0</h2>
+            </div>
+
+            <div class="card green">
+                <p>Total Stock Quantity</p>
+                <h2 id="totalQuantity">0</h2>
+            </div>
+
+            <div class="card orange">
+                <p>Low Stock Products</p>
+                <h2 id="lowStock">0</h2>
+            </div>
+
+            <div class="card red">
+                <p>Out of Stock Products</p>
+                <h2 id="outStock">0</h2>
+            </div>
+
+        </section>
+
+        <section class="report-box">
+
+            <div class="report-header">
+                <h2>Product-wise Stock Details</h2>
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="search"
+                    placeholder="Search products..."
+                    oninput="searchProducts()"
+                >
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Reorder Level</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="reportTable">
+                        <tr>
+                            <td colspan="7" class="empty">
+                                Loading stock report...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        let products = [];
+
+        async function loadReport() {
+            const table = document.getElementById("reportTable");
+
+            try {
+                const response = await fetch("/products");
+
+                if (!response.ok) {
+                    throw new Error("Unable to load products");
+                }
+
+                products = await response.json();
+
+                updateCards();
+                displayProducts(products);
+
+            } catch (error) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty">
+                            Error: ${error.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function updateCards() {
+            const totalProducts = products.length;
+
+            const totalQuantity = products.reduce(
+                (sum, product) => sum + Number(product.quantity || 0), 0
+            );
+
+            const lowStock = products.filter(product =>
+                Number(product.quantity) > 0 &&
+                Number(product.quantity) <= Number(product.reorder_level)
+            ).length;
+
+            const outStock = products.filter(product =>
+                Number(product.quantity) <= 0
+            ).length;
+
+            document.getElementById("totalProducts").innerText = totalProducts;
+            document.getElementById("totalQuantity").innerText = totalQuantity;
+            document.getElementById("lowStock").innerText = lowStock;
+            document.getElementById("outStock").innerText = outStock;
+        }
+
+        function displayProducts(data) {
+            const table = document.getElementById("reportTable");
+
+            if (data.length === 0) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty">No products found</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            table.innerHTML = data.map(product => {
+                const quantity = Number(product.quantity);
+                const reorder = Number(product.reorder_level);
+
+                let status = "In Stock";
+                let statusClass = "in-stock";
+
+                if (quantity <= 0) {
+                    status = "Out of Stock";
+                    statusClass = "out-stock";
+                } else if (quantity <= reorder) {
+                    status = "Low Stock";
+                    statusClass = "low-stock";
+                }
+
+                return `
+                    <tr>
+                        <td>${product.product_id}</td>
+                        <td>${product.product_name}</td>
+                        <td>${product.category}</td>
+                        <td>₹${Number(product.price).toLocaleString("en-IN")}</td>
+                        <td>${quantity}</td>
+                        <td>${reorder}</td>
+                        <td>
+                            <span class="status ${statusClass}">
+                                ${status}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        function searchProducts() {
+            const search = document.getElementById("searchInput")
+                .value.toLowerCase();
+
+            const filtered = products.filter(product =>
+                String(product.product_name).toLowerCase().includes(search) ||
+                String(product.category).toLowerCase().includes(search)
+            );
+
+            displayProducts(filtered);
+        }
+
+        loadReport();
+    </script>
+
+</body>
+</html>

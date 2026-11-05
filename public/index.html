@@ -1,0 +1,268 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management | Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">I</div>
+            <div>
+                <h2>InvenTrack</h2>
+                <p>Management System</p>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav class="sidebar-menu">
+
+            <a href="index.html" class="menu-item active">
+                <span>▦</span> Dashboard
+            </a>
+
+            <a href="products.html" class="menu-item">
+                <span>📦</span> Products
+            </a>
+
+            <a href="addProduct.html" class="menu-item">
+                <span>＋</span> Add Product
+            </a>
+
+            <a href="suppliers.html" class="menu-item">
+                <span>🏢</span> Suppliers
+            </a>
+
+            <a href="addSupplier.html" class="menu-item">
+                <span>＋</span> Add Supplier
+            </a>
+
+            <div class="menu-title">INVENTORY</div>
+
+            <a href="transactions.html" class="menu-item">
+                <span>⇄</span> Transactions
+            </a>
+
+            <a href="addTransaction.html" class="menu-item">
+                <span>↗</span> Stock Update
+            </a>
+
+            <a href="stockReport.html" class="menu-item">
+                <span>▤</span> Stock Reports
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Inventory Management</p>
+            <small>Version 1.0.0</small>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOP NAVBAR -->
+        <header class="topbar">
+
+            <div>
+                <h2>Dashboard</h2>
+                <p>Welcome back! Here's your inventory overview.</p>
+            </div>
+
+            <div class="topbar-right">
+                <div class="date" id="currentDate"></div>
+                <div class="profile">
+                    <div class="profile-icon">A</div>
+                    <div>
+                        <h4>Admin</h4>
+                        <small>Administrator</small>
+                    </div>
+                </div>
+            </div>
+
+        </header>
+
+
+        <!-- DASHBOARD CONTENT -->
+        <section class="content">
+
+            <!-- SUMMARY CARDS -->
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <p>Total Products</p>
+                        <h2 id="totalProducts">0</h2>
+                        <small>Products available</small>
+                    </div>
+                    <div class="stat-icon blue">📦</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <p>Total Suppliers</p>
+                        <h2 id="totalSuppliers">0</h2>
+                        <small>Registered suppliers</small>
+                    </div>
+                    <div class="stat-icon purple">🏢</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <p>Total Stock Units</p>
+                        <h2 id="totalStock">0</h2>
+                        <small>Available quantities</small>
+                    </div>
+                    <div class="stat-icon green">📊</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <p>Low Stock Items</p>
+                        <h2 id="lowStock">0</h2>
+                        <small>Need restocking</small>
+                    </div>
+                    <div class="stat-icon orange">⚠️</div>
+                </div>
+
+            </div>
+
+
+            <!-- QUICK ACTIONS -->
+            <div class="section-heading">
+                <div>
+                    <h3>Quick Actions</h3>
+                    <p>Manage your inventory easily</p>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+
+                <a href="addProduct.html" class="quick-card">
+                    <span class="quick-icon blue">＋</span>
+                    <div>
+                        <h4>Add Product</h4>
+                        <p>Add a new inventory item</p>
+                    </div>
+                </a>
+
+                <a href="addSupplier.html" class="quick-card">
+                    <span class="quick-icon purple">＋</span>
+                    <div>
+                        <h4>Add Supplier</h4>
+                        <p>Register a new supplier</p>
+                    </div>
+                </a>
+
+                <a href="addTransaction.html" class="quick-card">
+                    <span class="quick-icon green">⇄</span>
+                    <div>
+                        <h4>Stock Transaction</h4>
+                        <p>Record purchase or sale</p>
+                    </div>
+                </a>
+
+                <a href="stockReport.html" class="quick-card">
+                    <span class="quick-icon orange">▤</span>
+                    <div>
+                        <h4>View Reports</h4>
+                        <p>Check inventory reports</p>
+                    </div>
+                </a>
+
+            </div>
+
+
+            <!-- TABLE SECTION -->
+            <div class="dashboard-grid">
+
+                <!-- RECENT TRANSACTIONS -->
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h3>Recent Transactions</h3>
+                            <p>Latest stock activities</p>
+                        </div>
+
+                        <a href="transactions.html">View All →</a>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Product ID</th>
+                                    <th>Type</th>
+                                    <th>Quantity</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="recentTransactions">
+                                <tr>
+                                    <td colspan="5" class="empty">
+                                        Loading transactions...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+
+                <!-- LOW STOCK ALERTS -->
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h3>Low Stock Alerts</h3>
+                            <p>Products requiring attention</p>
+                        </div>
+
+                        <a href="products.html">View All →</a>
+                    </div>
+
+                    <div class="low-stock-list" id="lowStockList">
+                        <p class="empty">Loading stock information...</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FOOTER -->
+            <footer class="footer">
+                <p>© 2026 InvenTrack. Inventory Management System.</p>
+            </footer>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

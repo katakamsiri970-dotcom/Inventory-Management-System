@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Supplier | InvenTrack</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .supplier-form {
+            max-width: 700px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .supplier-form .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-bottom: 22px;
+        }
+
+        .supplier-form label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .supplier-form input,
+        .supplier-form textarea {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dbe1eb;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            font-family: Arial, sans-serif;
+        }
+
+        .supplier-form input {
+            height: 48px;
+        }
+
+        .supplier-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .supplier-form input:focus,
+        .supplier-form textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px #e0e7ff;
+        }
+
+        .submit-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .cancel-btn {
+            background: #e2e8f0;
+            color: #334155;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .id-box {
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .id-box label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .id-box input {
+            width: 100%;
+            height: 45px;
+            padding: 12px;
+            border: 1px solid #dbe1eb;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">I</div>
+            <div>
+                <h2>InvenTrack</h2>
+                <p>Management System</p>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav class="sidebar-menu">
+            <a href="index.html" class="menu-item">▦ Dashboard</a>
+            <a href="products.html" class="menu-item">📦 Products</a>
+            <a href="addProduct.html" class="menu-item">＋ Add Product</a>
+            <a href="suppliers.html" class="menu-item active">🏢 Suppliers</a>
+            <a href="addSupplier.html" class="menu-item">＋ Add Supplier</a>
+
+            <div class="menu-title">INVENTORY</div>
+            <a href="transactions.html" class="menu-item">⇄ Transactions</a>
+            <a href="addTransaction.html" class="menu-item">↗ Stock Update</a>
+            <a href="stockReport.html" class="menu-item">▤ Stock Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Inventory Management</p>
+            <small>Version 1.0.0</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2>Update Supplier</h2>
+                <p>Edit existing supplier information.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-icon">A</div>
+                <div>
+                    <h4>Admin</h4>
+                    <small>Administrator</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="section-heading">
+                <h3>Edit Supplier Details</h3>
+                <p>Load the supplier using its ID before editing.</p>
+            </div>
+
+            <div class="supplier-form">
+
+                <div class="id-box">
+                    <label>Supplier ID</label>
+                    <input type="number" id="supplier_id"
+                           placeholder="Enter Supplier ID" min="1">
+
+                    <button type="button" class="submit-btn"
+                            onclick="loadSupplier()" style="margin-top:12px;">
+                        Load Supplier
+                    </button>
+                </div>
+
+                <form id="updateForm">
+
+                    <div class="form-group">
+                        <label>Supplier Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" id="company" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="phone"
+                               maxlength="15" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea id="address" required></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        Update Supplier
+                    </button>
+
+                    <button type="reset" class="cancel-btn">
+                        Clear
+                    </button>
+
+                </form>
+
+                <p id="message" style="margin-top:20px;"></p>
+
+            </div>
+
+            <footer class="footer">
+                © 2026 InvenTrack. Inventory Management System.
+            </footer>
+
+        </section>
+    </main>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const urlId = params.get("id");
+
+if (urlId) {
+    document.getElementById("supplier_id").value = urlId;
+    loadSupplier();
+}
+
+async function loadSupplier() {
+
+    const id = document.getElementById("supplier_id").value;
+    const message = document.getElementById("message");
+
+    if (!id || Number(id) <= 0) {
+        message.style.color = "red";
+        message.innerText = "Please enter a valid Supplier ID.";
+        return;
+    }
+
+    try {
+        const response = await fetch(`/suppliers/${id}`);
+        const supplier = await response.json();
+
+        if (!response.ok) {
+            throw new Error(supplier.message || supplier.error);
+        }
+
+        document.getElementById("name").value = supplier.name;
+        document.getElementById("company").value = supplier.company;
+        document.getElementById("phone").value = supplier.phone;
+        document.getElementById("email").value = supplier.email;
+        document.getElementById("address").value = supplier.address;
+
+        message.style.color = "green";
+        message.innerText = "Supplier details loaded successfully!";
+
+    } catch (error) {
+        message.style.color = "red";
+        message.innerText = "Error: " + error.message;
+    }
+}
+
+document.getElementById("updateForm").addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const id = document.getElementById("supplier_id").value;
+
+    if (!id) {
+        alert("Please enter Supplier ID first.");
+        return;
+    }
+
+    const supplier = {
+        name: document.getElementById("name").value.trim(),
+        company: document.getElementById("company").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        address: document.getElementById("address").value.trim()
+    };
+
+    try {
+        const response = await fetch(`/suppliers/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(supplier)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || result.error);
+        }
+
+        document.getElementById("message").style.color = "green";
+        document.getElementById("message").innerText =
+            "Supplier updated successfully!";
+
+    } catch (error) {
+        document.getElementById("message").style.color = "red";
+        document.getElementById("message").innerText =
+            "Error: " + error.message;
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | InvenTrack</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">I</div>
+            <div>
+                <h2>InvenTrack</h2>
+                <p>Management System</p>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav class="sidebar-menu">
+            <a href="index.html" class="menu-item">▦ Dashboard</a>
+            <a href="products.html" class="menu-item active">📦 Products</a>
+            <a href="addProduct.html" class="menu-item">＋ Add Product</a>
+            <a href="suppliers.html" class="menu-item">🏢 Suppliers</a>
+            <a href="addSupplier.html" class="menu-item">＋ Add Supplier</a>
+
+            <div class="menu-title">INVENTORY</div>
+
+            <a href="transactions.html" class="menu-item">⇄ Transactions</a>
+            <a href="addTransaction.html" class="menu-item">↗ Stock Update</a>
+            <a href="stockReport.html" class="menu-item">▤ Stock Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Inventory Management</p>
+            <small>Version 1.0.0</small>
+        </div>
+    </aside>
+
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2>Products</h2>
+                <p>Manage and monitor all your inventory products.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-icon">A</div>
+                <div>
+                    <h4>Admin</h4>
+                    <small>Administrator</small>
+                </div>
+            </div>
+        </header>
+
+
+        <section class="content">
+
+            <div class="section-heading">
+                <h3>Product Management</h3>
+                <p>View, search and manage your products.</p>
+            </div>
+
+            <div class="panel">
+
+                <div class="panel-header">
+                    <div>
+                        <h3>All Products</h3>
+                        <p>Complete list of inventory items</p>
+                    </div>
+
+                    <a href="addProduct.html">+ Add New Product</a>
+                </div>
+
+                <input
+                    type="text"
+                    id="searchProduct"
+                    placeholder="Search by product name or category..."
+                    style="width:100%; padding:13px; border:1px solid #ddd; border-radius:8px; margin-bottom:20px;"
+                >
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Reorder Level</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="productTable">
+                            <tr>
+                                <td colspan="8" class="empty">Loading products...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <footer class="footer">
+                © 2026 InvenTrack. Inventory Management System.
+            </footer>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+let allProducts = [];
+
+async function loadProducts() {
+    try {
+        const response = await fetch("http://localhost:3000/products");
+
+        if (!response.ok) {
+            throw new Error("Unable to fetch products");
+        }
+
+        allProducts = await response.json();
+        displayProducts(allProducts);
+
+    } catch (error) {
+        document.getElementById("productTable").innerHTML =
+            `<tr><td colspan="8" class="empty">${error.message}</td></tr>`;
+    }
+}
+
+function displayProducts(products) {
+    const table = document.getElementById("productTable");
+
+    if (products.length === 0) {
+        table.innerHTML =
+            '<tr><td colspan="8" class="empty">No products found</td></tr>';
+        return;
+    }
+
+    table.innerHTML = products.map(product => {
+        const lowStock = Number(product.quantity) <= Number(product.reorder_level);
+
+        return `
+            <tr>
+                <td>${product.product_id}</td>
+                <td>${product.product_name}</td>
+                <td>${product.category}</td>
+                <td>₹${Number(product.price).toFixed(2)}</td>
+                <td>${product.quantity}</td>
+                <td>${product.reorder_level}</td>
+                <td>
+                    <span style="color:${lowStock ? '#ea580c' : '#16a34a'}; font-weight:bold;">
+                        ${lowStock ? 'Low Stock' : 'In Stock'}
+                    </span>
+                </td>
+                <td>
+    <a href="updateProduct.html?id=${product.product_id}"
+       class="action-btn edit-btn">Edit</a>
+
+    <a href="deleteProduct.html?id=${product.product_id}"
+       class="action-btn delete-btn">Delete</a>
+                </td>
+            </tr>
+        `;
+    }).join("");
+}
+
+document.getElementById("searchProduct").addEventListener("input", function() {
+    const search = this.value.toLowerCase();
+
+    const filtered = allProducts.filter(product =>
+        product.product_name.toLowerCase().includes(search) ||
+        product.category.toLowerCase().includes(search)
+    );
+
+    displayProducts(filtered);
+});
+
+loadProducts();
+</script>
+
+</body>
+</html>

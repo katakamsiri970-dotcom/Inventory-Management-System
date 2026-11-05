@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Product | InvenTrack</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .update-form {
+            max-width: 700px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .update-form .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-bottom: 22px;
+        }
+
+        .update-form label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .update-form input {
+            width: 100%;
+            height: 48px;
+            padding: 12px 15px;
+            border: 1px solid #dbe1eb;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .update-form input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px #e0e7ff;
+        }
+
+        .submit-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .cancel-btn {
+            background: #e2e8f0;
+            color: #334155;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .id-group {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 22px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">I</div>
+            <div>
+                <h2>InvenTrack</h2>
+                <p>Management System</p>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav class="sidebar-menu">
+            <a href="index.html" class="menu-item">▦ Dashboard</a>
+            <a href="products.html" class="menu-item active">📦 Products</a>
+            <a href="addProduct.html" class="menu-item">＋ Add Product</a>
+            <a href="suppliers.html" class="menu-item">🏢 Suppliers</a>
+            <a href="addSupplier.html" class="menu-item">＋ Add Supplier</a>
+
+            <div class="menu-title">INVENTORY</div>
+            <a href="transactions.html" class="menu-item">⇄ Transactions</a>
+            <a href="addTransaction.html" class="menu-item">↗ Stock Update</a>
+            <a href="stockReport.html" class="menu-item">▤ Stock Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Inventory Management</p>
+            <small>Version 1.0.0</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2>Update Product</h2>
+                <p>Modify existing product information.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-icon">A</div>
+                <div>
+                    <h4>Admin</h4>
+                    <small>Administrator</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="section-heading">
+                <h3>Edit Product Details</h3>
+                <p>Enter the Product ID to load its information.</p>
+            </div>
+
+            <div class="update-form">
+
+                <div class="id-group">
+                    <label>Product ID</label>
+                    <input type="number" id="product_id"
+                           placeholder="Enter Product ID" min="1">
+                    <button type="button" class="submit-btn"
+                            onclick="loadProduct()" style="margin-top:12px;">
+                        Load Product
+                    </button>
+                </div>
+
+                <form id="updateForm">
+
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="product_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" id="category" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" id="price"
+                               min="0.01" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" id="quantity"
+                               min="0" step="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Reorder Level</label>
+                        <input type="number" id="reorder_level"
+                               min="0" step="1" required>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        Update Product
+                    </button>
+
+                    <button type="reset" class="cancel-btn">
+                        Clear
+                    </button>
+
+                </form>
+
+                <p id="message" style="margin-top:20px;"></p>
+            </div>
+
+            <footer class="footer">
+                © 2026 InvenTrack. Inventory Management System.
+            </footer>
+
+        </section>
+    </main>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const urlId = params.get("id");
+
+if (urlId) {
+    document.getElementById("product_id").value = urlId;
+    loadProduct();
+}
+
+async function loadProduct() {
+    const id = document.getElementById("product_id").value;
+    const message = document.getElementById("message");
+
+    if (!id) {
+        message.style.color = "red";
+        message.innerText = "Please enter Product ID.";
+        return;
+    }
+
+    try {
+        const response = await fetch(`/products/${id}`);
+        const product = await response.json();
+
+        if (!response.ok) {
+            throw new Error(product.message || product.error);
+        }
+
+        document.getElementById("product_name").value = product.product_name;
+        document.getElementById("category").value = product.category;
+        document.getElementById("price").value = product.price;
+        document.getElementById("quantity").value = product.quantity;
+        document.getElementById("reorder_level").value = product.reorder_level;
+
+        message.style.color = "green";
+        message.innerText = "Product details loaded successfully!";
+
+    } catch (error) {
+        message.style.color = "red";
+        message.innerText = "Error: " + error.message;
+    }
+}
+
+document.getElementById("updateForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const id = document.getElementById("product_id").value;
+
+    if (!id) {
+        alert("Please enter Product ID first.");
+        return;
+    }
+
+    const product = {
+        product_name: document.getElementById("product_name").value.trim(),
+        category: document.getElementById("category").value.trim(),
+        price: document.getElementById("price").value,
+        quantity: document.getElementById("quantity").value,
+        reorder_level: document.getElementById("reorder_level").value
+    };
+
+    try {
+        const response = await fetch(`/products/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(product)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || result.error);
+        }
+
+        document.getElementById("message").style.color = "green";
+        document.getElementById("message").innerText =
+            "Product updated successfully!";
+
+    } catch (error) {
+        document.getElementById("message").style.color = "red";
+        document.getElementById("message").innerText =
+            "Error: " + error.message;
+    }
+});
+</script>
+
+</body>
+</html>

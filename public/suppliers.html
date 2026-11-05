@@ -1,0 +1,285 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suppliers | InvenTrack</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .supplier-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .search-box {
+            width: 300px;
+            max-width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dbe1eb;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search-box:focus {
+            border-color: #6366f1;
+        }
+
+        .add-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .add-btn:hover {
+            background: #3730a3;
+        }
+
+        .table-container {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .supplier-table {
+            min-width: 850px;
+        }
+
+        .supplier-table th {
+            white-space: nowrap;
+        }
+
+        .supplier-table td {
+            white-space: nowrap;
+        }
+
+        .action-btn {
+            text-decoration: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .edit-btn {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .count-text {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">I</div>
+            <div>
+                <h2>InvenTrack</h2>
+                <p>Management System</p>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav class="sidebar-menu">
+            <a href="index.html" class="menu-item">▦ Dashboard</a>
+            <a href="products.html" class="menu-item">📦 Products</a>
+            <a href="addProduct.html" class="menu-item">＋ Add Product</a>
+            <a href="suppliers.html" class="menu-item active">🏢 Suppliers</a>
+            <a href="addSupplier.html" class="menu-item">＋ Add Supplier</a>
+
+            <div class="menu-title">INVENTORY</div>
+            <a href="transactions.html" class="menu-item">⇄ Transactions</a>
+            <a href="addTransaction.html" class="menu-item">↗ Stock Update</a>
+            <a href="stockReport.html" class="menu-item">▤ Stock Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Inventory Management</p>
+            <small>Version 1.0.0</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2>Suppliers</h2>
+                <p>Manage your supplier information.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-icon">A</div>
+                <div>
+                    <h4>Admin</h4>
+                    <small>Administrator</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="section-heading">
+                <h3>Supplier Management</h3>
+                <p>View and manage all registered suppliers.</p>
+            </div>
+
+            <div class="supplier-toolbar">
+                <input type="text" id="searchInput"
+                       class="search-box"
+                       placeholder="Search supplier name or company...">
+
+                <a href="addSupplier.html" class="add-btn">
+                    + Add New Supplier
+                </a>
+            </div>
+
+            <p class="count-text" id="countText">Loading suppliers...</p>
+
+            <div class="table-container">
+
+                <table class="supplier-table">
+                    <thead>
+                        <tr>
+                            <th>Supplier ID</th>
+                            <th>Name</th>
+                            <th>Company</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Address</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="supplierTable">
+                        <tr>
+                            <td colspan="7" class="empty">
+                                Loading supplier details...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+            <footer class="footer">
+                © 2026 InvenTrack. Inventory Management System.
+            </footer>
+
+        </section>
+    </main>
+</div>
+
+<script>
+let suppliers = [];
+
+async function loadSuppliers() {
+    const table = document.getElementById("supplierTable");
+
+    try {
+        const response = await fetch("/suppliers");
+        if (!response.ok) throw new Error("Unable to load suppliers");
+
+        suppliers = await response.json();
+        displaySuppliers(suppliers);
+
+    } catch (error) {
+        table.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty">
+                    Error: ${error.message}
+                </td>
+            </tr>
+        `;
+        document.getElementById("countText").innerText = "Could not load suppliers";
+    }
+}
+
+function displaySuppliers(data) {
+    const table = document.getElementById("supplierTable");
+
+    document.getElementById("countText").innerText =
+        "Total Suppliers: " + data.length;
+
+    if (data.length === 0) {
+        table.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty">
+                    No suppliers found. Add your first supplier!
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    table.innerHTML = data.map(supplier => `
+        <tr>
+            <td>${supplier.supplier_id}</td>
+            <td>${escapeHTML(supplier.name)}</td>
+            <td>${escapeHTML(supplier.company)}</td>
+            <td>${escapeHTML(supplier.phone)}</td>
+            <td>${escapeHTML(supplier.email)}</td>
+            <td>${escapeHTML(supplier.address)}</td>
+            <td>
+                <a href="updateSupplier.html?id=${supplier.supplier_id}"
+                   class="action-btn edit-btn">Edit</a>
+
+                <a href="deleteSupplier.html?id=${supplier.supplier_id}"
+                   class="action-btn delete-btn">Delete</a>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+document.getElementById("searchInput").addEventListener("input", function() {
+    const search = this.value.toLowerCase();
+
+    const filtered = suppliers.filter(supplier =>
+        String(supplier.name ?? "").toLowerCase().includes(search) ||
+        String(supplier.company ?? "").toLowerCase().includes(search)
+    );
+
+    displaySuppliers(filtered);
+});
+
+loadSuppliers();
+</script>
+
+</body>
+</html>

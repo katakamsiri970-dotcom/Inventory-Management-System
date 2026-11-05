@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Supplier | InvenTrack</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .supplier-form {
+            max-width: 700px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .supplier-form .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-bottom: 22px;
+        }
+
+        .supplier-form label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .supplier-form input,
+        .supplier-form textarea {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dbe1eb;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            font-family: Arial, sans-serif;
+        }
+
+        .supplier-form input {
+            height: 48px;
+        }
+
+        .supplier-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .supplier-form input:focus,
+        .supplier-form textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px #e0e7ff;
+        }
+
+        .submit-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .submit-btn:hover {
+            background: #3730a3;
+        }
+
+        .cancel-btn {
+            background: #e2e8f0;
+            color: #334155;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">I</div>
+            <div>
+                <h2>InvenTrack</h2>
+                <p>Management System</p>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav class="sidebar-menu">
+            <a href="index.html" class="menu-item">▦ Dashboard</a>
+            <a href="products.html" class="menu-item">📦 Products</a>
+            <a href="addProduct.html" class="menu-item">＋ Add Product</a>
+            <a href="suppliers.html" class="menu-item">🏢 Suppliers</a>
+            <a href="addSupplier.html" class="menu-item active">＋ Add Supplier</a>
+
+            <div class="menu-title">INVENTORY</div>
+            <a href="transactions.html" class="menu-item">⇄ Transactions</a>
+            <a href="addTransaction.html" class="menu-item">↗ Stock Update</a>
+            <a href="stockReport.html" class="menu-item">▤ Stock Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Inventory Management</p>
+            <small>Version 1.0.0</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2>Add New Supplier</h2>
+                <p>Register a new supplier in your system.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-icon">A</div>
+                <div>
+                    <h4>Admin</h4>
+                    <small>Administrator</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="section-heading">
+                <h3>Supplier Information</h3>
+                <p>Enter the supplier's contact and company details.</p>
+            </div>
+
+            <div class="supplier-form">
+
+                <form id="supplierForm">
+
+                    <div class="form-group">
+                        <label>Supplier Name</label>
+                        <input type="text" id="name"
+                               placeholder="Enter supplier name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" id="company"
+                               placeholder="Enter company name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="phone"
+                               placeholder="Enter phone number"
+                               maxlength="15" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="email"
+                               placeholder="Enter email address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea id="address"
+                                  placeholder="Enter complete address"
+                                  required></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        Add Supplier
+                    </button>
+
+                    <button type="reset" class="cancel-btn">
+                        Clear Form
+                    </button>
+
+                    <p id="message" style="margin-top:20px;"></p>
+
+                </form>
+            </div>
+
+            <footer class="footer">
+                © 2026 InvenTrack. Inventory Management System.
+            </footer>
+
+        </section>
+    </main>
+</div>
+
+<script>
+document.getElementById("supplierForm").addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const supplier = {
+        name: document.getElementById("name").value.trim(),
+        company: document.getElementById("company").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        address: document.getElementById("address").value.trim()
+    };
+
+    try {
+        const response = await fetch("/suppliers", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(supplier)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || result.message);
+        }
+
+        document.getElementById("message").style.color = "green";
+        document.getElementById("message").innerText =
+            result.message + " Supplier ID: " + result.supplier_id;
+
+        document.getElementById("supplierForm").reset();
+
+    } catch (error) {
+        document.getElementById("message").style.color = "red";
+        document.getElementById("message").innerText =
+            "Error: " + error.message;
+    }
+});
+</script>
+
+</body>
+</html>

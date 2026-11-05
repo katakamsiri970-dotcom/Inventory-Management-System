@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Supplier | InvenTrack</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .delete-card {
+            max-width: 650px;
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .delete-icon {
+            width: 65px;
+            height: 65px;
+            background: #fee2e2;
+            color: #dc2626;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        .delete-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .delete-card p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 22px;
+        }
+
+        .delete-card label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .delete-card input {
+            width: 100%;
+            height: 48px;
+            padding: 12px;
+            border: 1px solid #dbe1eb;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .delete-card input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px #e0e7ff;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+            color: white;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .delete-btn:hover {
+            background: #b91c1c;
+        }
+
+        .cancel-btn {
+            background: #e2e8f0;
+            color: #334155;
+            padding: 13px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .warning {
+            background: #fff7ed;
+            border-left: 4px solid #f97316;
+            padding: 14px;
+            color: #9a3412;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">I</div>
+            <div>
+                <h2>InvenTrack</h2>
+                <p>Management System</p>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav class="sidebar-menu">
+            <a href="index.html" class="menu-item">▦ Dashboard</a>
+            <a href="products.html" class="menu-item">📦 Products</a>
+            <a href="addProduct.html" class="menu-item">＋ Add Product</a>
+            <a href="suppliers.html" class="menu-item active">🏢 Suppliers</a>
+            <a href="addSupplier.html" class="menu-item">＋ Add Supplier</a>
+
+            <div class="menu-title">INVENTORY</div>
+            <a href="transactions.html" class="menu-item">⇄ Transactions</a>
+            <a href="addTransaction.html" class="menu-item">↗ Stock Update</a>
+            <a href="stockReport.html" class="menu-item">▤ Stock Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Inventory Management</p>
+            <small>Version 1.0.0</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2>Delete Supplier</h2>
+                <p>Remove a supplier from your system.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-icon">A</div>
+                <div>
+                    <h4>Admin</h4>
+                    <small>Administrator</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="section-heading">
+                <h3>Remove Supplier</h3>
+                <p>Enter the supplier ID to delete a supplier.</p>
+            </div>
+
+            <div class="delete-card">
+
+                <div class="delete-icon">🗑</div>
+
+                <h3>Delete Supplier</h3>
+                <p>Enter the Supplier ID carefully before removing the supplier.</p>
+
+                <div class="warning">
+                    ⚠ Warning: This action cannot be undone.
+                </div>
+
+                <label>Supplier ID</label>
+                <input type="number" id="supplier_id"
+                       placeholder="Enter Supplier ID" min="1">
+
+                <button type="button" class="delete-btn"
+                        onclick="deleteSupplier()">
+                    Delete Supplier
+                </button>
+
+                <a href="suppliers.html" class="cancel-btn">Cancel</a>
+
+                <p id="message" style="margin-top:22px;"></p>
+
+            </div>
+
+            <footer class="footer">
+                © 2026 InvenTrack. Inventory Management System.
+            </footer>
+
+        </section>
+    </main>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const urlId = params.get("id");
+
+if (urlId) {
+    document.getElementById("supplier_id").value = urlId;
+}
+
+async function deleteSupplier() {
+
+    const id = document.getElementById("supplier_id").value;
+    const message = document.getElementById("message");
+
+    if (!id || Number(id) <= 0) {
+        message.style.color = "red";
+        message.innerText = "Please enter a valid Supplier ID.";
+        return;
+    }
+
+    if (!confirm("Are you sure you want to delete Supplier ID " + id + "?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/suppliers/${id}`, {
+            method: "DELETE"
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || result.error);
+        }
+
+        message.style.color = "green";
+        message.innerText = "Supplier deleted successfully!";
+
+        document.getElementById("supplier_id").value = "";
+
+    } catch (error) {
+        message.style.color = "red";
+        message.innerText = "Error: " + error.message;
+    }
+}
+</script>
+
+</body>
+</html>

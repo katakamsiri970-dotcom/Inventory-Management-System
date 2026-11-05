@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Transaction | InvenTrack</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .transaction-form {
+            max-width: 700px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+        }
+
+        .transaction-form label {
+            display: block;
+            margin: 18px 0 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .transaction-form input,
+        .transaction-form select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        .transaction-form button {
+            margin-top: 25px;
+            padding: 13px 25px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .transaction-form button:hover {
+            background: #1d4ed8;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        #message {
+            margin-top: 18px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>InvenTrack</h2>
+    <p>Management System</p>
+
+    <h4>MAIN MENU</h4>
+
+    <a href="index.html">▦ Dashboard</a>
+    <a href="products.html">📦 Products</a>
+    <a href="addProduct.html">＋ Add Product</a>
+    <a href="suppliers.html">🏢 Suppliers</a>
+    <a href="transactions.html" class="active">🔄 Transactions</a>
+    <a href="stockReport.html">📊 Stock Report</a>
+</div>
+
+<div class="main-content">
+
+    <div class="topbar">
+        <h2>Add Stock Transaction</h2>
+    </div>
+
+    <div class="content">
+
+        <a href="transactions.html" class="back-link">
+            ← Back to Transactions
+        </a>
+
+        <form class="transaction-form" id="transactionForm">
+
+            <h2>Transaction Details</h2>
+
+            <label>Product ID</label>
+            <input type="number" id="product_id"
+                   placeholder="Enter Product ID" min="1" required>
+
+            <label>Supplier ID</label>
+            <input type="number" id="supplier_id"
+                   placeholder="Enter Supplier ID (Purchase only)">
+
+            <label>Transaction Type</label>
+            <select id="transaction_type" required>
+                <option value="">Select Transaction Type</option>
+                <option value="purchase">Purchase</option>
+                <option value="sale">Sale</option>
+            </select>
+
+            <label>Quantity</label>
+            <input type="number" id="quantity"
+                   placeholder="Enter Quantity" min="1" required>
+
+            <label>Transaction Date</label>
+            <input type="date" id="transaction_date" required>
+
+            <button type="submit">Save Transaction</button>
+
+            <p id="message"></p>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+    // Set today's date automatically
+    document.getElementById("transaction_date").value =
+        new Date().toLocaleDateString("en-CA");
+
+    const typeField = document.getElementById("transaction_type");
+    const supplierField = document.getElementById("supplier_id");
+
+    typeField.addEventListener("change", function () {
+        if (this.value === "sale") {
+            supplierField.value = "";
+            supplierField.disabled = true;
+        } else {
+            supplierField.disabled = false;
+        }
+    });
+
+    document.getElementById("transactionForm")
+        .addEventListener("submit", async function (e) {
+
+        e.preventDefault();
+
+        const data = {
+            product_id: document.getElementById("product_id").value,
+            supplier_id: supplierField.value || null,
+            transaction_type: typeField.value,
+            quantity: document.getElementById("quantity").value,
+            transaction_date: document.getElementById("transaction_date").value
+        };
+
+        const message = document.getElementById("message");
+
+        try {
+            const response = await fetch("/transactions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || result.error);
+            }
+
+            message.style.color = "green";
+            message.innerHTML =
+                "✓ " + result.message +
+                "<br>Updated Stock: " + result.updated_stock;
+
+            document.getElementById("transactionForm").reset();
+
+            document.getElementById("transaction_date").value =
+                new Date().toLocaleDateString("en-CA");
+
+            supplierField.disabled = false;
+
+        } catch (error) {
+            message.style.color = "red";
+            message.textContent = "Error: " + error.message;
+        }
+    });
+</script>
+
+</body>
+</html>

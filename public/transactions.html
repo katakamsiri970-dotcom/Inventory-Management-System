@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions | InvenTrack</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .transaction-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .search-box {
+            width: 300px;
+            max-width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dbe1eb;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search-box:focus {
+            border-color: #6366f1;
+        }
+
+        .add-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .table-container {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .transaction-table {
+            min-width: 750px;
+        }
+
+        .transaction-table th,
+        .transaction-table td {
+            white-space: nowrap;
+        }
+
+        .type-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .purchase {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .sale {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .count-text {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">I</div>
+            <div>
+                <h2>InvenTrack</h2>
+                <p>Management System</p>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav class="sidebar-menu">
+            <a href="index.html" class="menu-item">▦ Dashboard</a>
+            <a href="products.html" class="menu-item">📦 Products</a>
+            <a href="addProduct.html" class="menu-item">＋ Add Product</a>
+            <a href="suppliers.html" class="menu-item">🏢 Suppliers</a>
+            <a href="addSupplier.html" class="menu-item">＋ Add Supplier</a>
+
+            <div class="menu-title">INVENTORY</div>
+            <a href="transactions.html" class="menu-item active">⇄ Transactions</a>
+            <a href="addTransaction.html" class="menu-item">↗ Stock Update</a>
+            <a href="stockReport.html" class="menu-item">▤ Stock Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Inventory Management</p>
+            <small>Version 1.0.0</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2>Stock Transactions</h2>
+                <p>Track all purchases and sales.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-icon">A</div>
+                <div>
+                    <h4>Admin</h4>
+                    <small>Administrator</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="section-heading">
+                <h3>Transaction History</h3>
+                <p>View all stock movements recorded in the system.</p>
+            </div>
+
+            <div class="transaction-toolbar">
+
+                <input type="text" id="searchInput"
+                       class="search-box"
+                       placeholder="Search by Product ID or Type...">
+
+                <a href="addTransaction.html" class="add-btn">
+                    + Add Transaction
+                </a>
+
+            </div>
+
+            <p class="count-text" id="countText">
+                Loading transactions...
+            </p>
+
+            <div class="table-container">
+
+                <table class="transaction-table">
+
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Product ID</th>
+                            <th>Supplier ID</th>
+                            <th>Transaction Type</th>
+                            <th>Quantity</th>
+                            <th>Transaction Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="transactionTable">
+                        <tr>
+                            <td colspan="6" class="empty">
+                                Loading transaction details...
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <footer class="footer">
+                © 2026 InvenTrack. Inventory Management System.
+            </footer>
+
+        </section>
+    </main>
+</div>
+
+<script>
+let transactions = [];
+
+async function loadTransactions() {
+
+    const table = document.getElementById("transactionTable");
+
+    try {
+        const response = await fetch("/transactions");
+
+        if (!response.ok) {
+            throw new Error("Unable to load transactions");
+        }
+
+        transactions = await response.json();
+        displayTransactions(transactions);
+
+    } catch (error) {
+        table.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty">
+                    Error: ${error.message}
+                </td>
+            </tr>
+        `;
+
+        document.getElementById("countText").innerText =
+            "Could not load transactions";
+    }
+}
+
+function displayTransactions(data) {
+
+    const table = document.getElementById("transactionTable");
+
+    document.getElementById("countText").innerText =
+        "Total Transactions: " + data.length;
+
+    if (data.length === 0) {
+        table.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty">
+                    No transactions found. Add your first transaction!
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    table.innerHTML = data.map(item => {
+
+        const type = String(item.transaction_type || "").toLowerCase();
+
+        const badgeClass = type === "purchase" ? "purchase" :
+                           type === "sale" ? "sale" : "";
+
+        const date = item.transaction_date
+            ? new Date(item.transaction_date).toLocaleDateString("en-IN")
+            : "-";
+
+        return `
+            <tr>
+                <td>${item.transaction_id}</td>
+                <td>${item.product_id}</td>
+                <td>${item.supplier_id ?? "-"}</td>
+                <td>
+                    <span class="type-badge ${badgeClass}">
+                        ${escapeHTML(item.transaction_type)}
+                    </span>
+                </td>
+                <td>${item.quantity}</td>
+                <td>${date}</td>
+            </tr>
+        `;
+    }).join("");
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+document.getElementById("searchInput").addEventListener("input", function() {
+
+    const search = this.value.toLowerCase();
+
+    const filtered = transactions.filter(item =>
+        String(item.product_id).includes(search) ||
+        String(item.transaction_type || "").toLowerCase().includes(search)
+    );
+
+    displayTransactions(filtered);
+});
+
+loadTransactions();
+</script>
+
+</body>
+</html>

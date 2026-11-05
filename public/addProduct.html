@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product | InvenTrack</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .product-form {
+            max-width: 700px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .product-form .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 22px;
+            gap: 9px;
+        }
+
+        .product-form label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .product-form input {
+            width: 100%;
+            height: 48px;
+            padding: 12px 15px;
+            border: 1px solid #dbe1eb;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .product-form input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px #e0e7ff;
+        }
+
+        .submit-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .submit-btn:hover {
+            background: #3730a3;
+        }
+
+        .cancel-btn {
+            background: #e2e8f0;
+            color: #334155;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">I</div>
+            <div>
+                <h2>InvenTrack</h2>
+                <p>Management System</p>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav class="sidebar-menu">
+            <a href="index.html" class="menu-item">▦ Dashboard</a>
+            <a href="products.html" class="menu-item">📦 Products</a>
+            <a href="addProduct.html" class="menu-item active">＋ Add Product</a>
+            <a href="suppliers.html" class="menu-item">🏢 Suppliers</a>
+            <a href="addSupplier.html" class="menu-item">＋ Add Supplier</a>
+
+            <div class="menu-title">INVENTORY</div>
+
+            <a href="transactions.html" class="menu-item">⇄ Transactions</a>
+            <a href="addTransaction.html" class="menu-item">↗ Stock Update</a>
+            <a href="stockReport.html" class="menu-item">▤ Stock Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Inventory Management</p>
+            <small>Version 1.0.0</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2>Add New Product</h2>
+                <p>Register a new product in your inventory.</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-icon">A</div>
+                <div>
+                    <h4>Admin</h4>
+                    <small>Administrator</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="section-heading">
+                <h3>Product Information</h3>
+                <p>Fill in all the details to add a product.</p>
+            </div>
+
+            <div class="product-form">
+
+                <form id="productForm">
+
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="product_name"
+                               placeholder="Enter product name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" id="category"
+                               placeholder="Example: Electronics" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" id="price"
+                               placeholder="Enter product price"
+                               min="0.01" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" id="quantity"
+                               placeholder="Enter available quantity"
+                               min="0" step="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Reorder Level</label>
+                        <input type="number" id="reorder_level"
+                               placeholder="Enter minimum stock level"
+                               min="0" step="1" required>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        Add Product
+                    </button>
+
+                    <button type="reset" class="cancel-btn">
+                        Clear Form
+                    </button>
+
+                    <p id="message" style="margin-top:20px;"></p>
+
+                </form>
+            </div>
+
+            <footer class="footer">
+                © 2026 InvenTrack. Inventory Management System.
+            </footer>
+
+        </section>
+    </main>
+</div>
+
+<script>
+document.getElementById("productForm").addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const product = {
+        product_name: document.getElementById("product_name").value.trim(),
+        category: document.getElementById("category").value.trim(),
+        price: document.getElementById("price").value,
+        quantity: document.getElementById("quantity").value,
+        reorder_level: document.getElementById("reorder_level").value
+    };
+
+    try {
+        const response = await fetch("/products", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(product)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || result.message);
+        }
+
+        document.getElementById("message").style.color = "green";
+        document.getElementById("message").innerText =
+            result.message + " Product ID: " + result.product_id;
+
+        document.getElementById("productForm").reset();
+
+    } catch (error) {
+        document.getElementById("message").style.color = "red";
+        document.getElementById("message").innerText =
+            "Error: " + error.message;
+    }
+});
+</script>
+
+</body>
+</html>

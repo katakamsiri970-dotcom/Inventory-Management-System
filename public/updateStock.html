@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Update | InvenTrack</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">I</div>
+            <div>
+                <h2>InvenTrack</h2>
+                <p>Management System</p>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav class="sidebar-menu">
+            <a href="index.html" class="menu-item"><span>▦</span> Dashboard</a>
+            <a href="products.html" class="menu-item"><span>📦</span> Products</a>
+            <a href="addProduct.html" class="menu-item"><span>＋</span> Add Product</a>
+            <a href="suppliers.html" class="menu-item"><span>🏢</span> Suppliers</a>
+            <a href="addSupplier.html" class="menu-item"><span>＋</span> Add Supplier</a>
+
+            <div class="menu-title">INVENTORY</div>
+
+            <a href="transactions.html" class="menu-item"><span>⇄</span> Transactions</a>
+            <a href="updateStock.html" class="menu-item active"><span>↗</span> Stock Update</a>
+            <a href="stockReport.html" class="menu-item"><span>▤</span> Stock Reports</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Inventory Management</p>
+            <small>Version 1.0.0</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2>Stock Update</h2>
+                <p>Update your product stock quantity</p>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="panel" style="max-width:750px; margin:auto;">
+
+                <div class="panel-header">
+                    <div>
+                        <h3>Update Inventory Stock</h3>
+                        <p>Select a product and update its available quantity</p>
+                    </div>
+                    <div class="stat-icon green">📦</div>
+                </div>
+
+                <form id="stockForm">
+
+                    <label>Choose Product</label>
+                    <select id="productId" required>
+                        <option value="">Loading products...</option>
+                    </select>
+
+                    <div style="margin-top:20px;">
+                        <button type="button" id="viewBtn">View Product Details</button>
+                    </div>
+
+                    <div id="productDetails"
+                         style="margin-top:20px; padding:18px; background:#F3F7FB; border-radius:12px; display:none;">
+                    </div>
+
+                    <div style="margin-top:22px;">
+                        <label>New Stock Quantity</label>
+                        <input type="number" id="newQuantity"
+                               min="0" step="1" placeholder="Enter new quantity" required>
+                    </div>
+
+                    <div style="margin-top:25px; display:flex; gap:12px;">
+                        <button type="submit">Update Stock</button>
+                        <button type="reset" style="background:#718198;">Clear</button>
+                    </div>
+
+                    <p id="message" style="margin-top:18px; font-weight:600;"></p>
+
+                </form>
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+<script>
+let selectedProduct = null;
+
+const productSelect = document.getElementById("productId");
+const details = document.getElementById("productDetails");
+const message = document.getElementById("message");
+
+async function loadProducts() {
+    try {
+        const response = await fetch("/products");
+        if (!response.ok) throw new Error("Failed to load products");
+
+        const products = await response.json();
+
+        productSelect.innerHTML = '<option value="">Select Product</option>';
+
+        products.forEach(product => {
+            productSelect.innerHTML += `
+                <option value="${product.product_id}">
+                    ${product.product_name} (ID: ${product.product_id})
+                </option>
+            `;
+        });
+
+    } catch (error) {
+        productSelect.innerHTML = '<option value="">Unable to load products</option>';
+        message.textContent = error.message;
+        message.style.color = "red";
+    }
+}
+
+document.getElementById("viewBtn").addEventListener("click", async () => {
+    const id = productSelect.value;
+
+    if (!id) {
+        alert("Please select a product");
+        return;
+    }
+
+    try {
+        const response = await fetch(`/products/${id}`);
+        if (!response.ok) throw new Error("Product not found");
+
+        selectedProduct = await response.json();
+
+        details.style.display = "block";
+        details.innerHTML = `
+            <h3 style="margin-bottom:12px;">Product Details</h3>
+            <p><strong>Product:</strong> ${selectedProduct.product_name}</p>
+            <p><strong>Category:</strong> ${selectedProduct.category}</p>
+            <p><strong>Current Quantity:</strong> ${selectedProduct.quantity}</p>
+            <p><strong>Reorder Level:</strong> ${selectedProduct.reorder_level}</p>
+        `;
+
+        document.getElementById("newQuantity").value = selectedProduct.quantity;
+
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+document.getElementById("stockForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const id = productSelect.value;
+    const quantity = Number(document.getElementById("newQuantity").value);
+
+    if (!id || !selectedProduct || String(selectedProduct.product_id) !== id) {
+        alert("Please select a product and view its details first");
+        return;
+    }
+
+    if (!Number.isInteger(quantity) || quantity < 0) {
+        alert("Enter a valid stock quantity");
+        return;
+    }
+
+    try {
+        const response = await fetch(`/products/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                ...selectedProduct,
+                quantity: quantity
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || result.message || "Stock update failed");
+        }
+
+        message.textContent = "Stock updated successfully!";
+        message.style.color = "#119B78";
+
+        selectedProduct.quantity = quantity;
+
+        details.innerHTML = `
+            <h3>Product Details</h3>
+            <p><strong>Product:</strong> ${selectedProduct.product_name}</p>
+            <p><strong>Category:</strong> ${selectedProduct.category}</p>
+            <p><strong>Current Quantity:</strong> ${selectedProduct.quantity}</p>
+            <p><strong>Reorder Level:</strong> ${selectedProduct.reorder_level}</p>
+        `;
+
+    } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "red";
+    }
+});
+
+document.getElementById("stockForm").addEventListener("reset", () => {
+    selectedProduct = null;
+    details.style.display = "none";
+    message.textContent = "";
+});
+
+loadProducts();
+</script>
+
+</body>
+</html>
